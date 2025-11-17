@@ -5,8 +5,8 @@ import { ClerkProvider } from "@clerk/nextjs";
 import ClientBody from "@/components/ClientBody";
 
 export const metadata: Metadata = {
-  title: "VIBED",
-  description: "Welcome to VIBED",
+  title: "Bookmark AI",
+  description: "Save and organize your favorite links with AI-powered features",
   icons: {
     icon: "/convex.svg",
   },
