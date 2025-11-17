@@ -39,13 +39,13 @@ export default function RootLayout({
                 fontFamily: "'Commissioner', system-ui, sans-serif",
               },
               elements: {
-                card: "bg-white border-[#E8E4DF] shadow-sm",
-                headerTitle: "text-[#1A1614] font-['Bricolage_Grotesque']",
-                headerSubtitle: "text-[#8B8682]",
-                socialButtonsBlockButton: "border-[#E8E4DF] hover:bg-[#F5F2EE]",
-                formButtonPrimary: "bg-[#C85A3C] text-white hover:bg-[#B54F35]",
-                formFieldInput: "bg-white border-[#E8E4DF] text-[#1A1614]",
-                footerActionLink: "text-[#C85A3C] hover:text-[#B54F35]",
+                card: "bg-white border-border shadow-sm",
+                headerTitle: "text-foreground font-['Bricolage_Grotesque']",
+                headerSubtitle: "text-muted-foreground",
+                socialButtonsBlockButton: "border-border hover:bg-secondary",
+                formButtonPrimary: "bg-primary text-white hover:bg-primary-hover",
+                formFieldInput: "bg-white border-border text-foreground",
+                footerActionLink: "text-primary hover:text-primary-hover",
               }
             }}
           >

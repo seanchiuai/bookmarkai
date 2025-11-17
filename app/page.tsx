@@ -44,12 +44,12 @@ function SignInForm() {
         <p className="text-muted-foreground mb-12 text-lg">A minimal space for your tasks</p>
         <div className="flex flex-col gap-3">
           <SignInButton mode="modal">
-            <button className="w-full px-6 py-3.5 bg-primary text-primary-foreground rounded-xl hover:bg-[#B54F35] transition-all duration-200 shadow-sm hover:shadow font-medium">
+            <button type="button" className="w-full px-6 py-3.5 bg-primary text-primary-foreground rounded-xl hover:bg-primary-hover transition-all duration-200 shadow-sm hover:shadow font-medium">
               Sign in
             </button>
           </SignInButton>
           <SignUpButton mode="modal">
-            <button className="w-full px-6 py-3.5 border-2 border-border bg-white rounded-xl hover:bg-secondary transition-all duration-200 font-medium">
+            <button type="button" className="w-full px-6 py-3.5 border-2 border-border bg-white rounded-xl hover:bg-secondary transition-all duration-200 font-medium">
               Create account
             </button>
           </SignUpButton>

@@ -98,7 +98,7 @@ export default function TodoDashboard() {
               <div className="flex gap-2">
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-primary text-primary-foreground text-sm rounded-xl hover:bg-[#B54F35] transition-all duration-200 shadow-sm hover:shadow font-medium"
+                  className="px-5 py-2.5 bg-primary text-primary-foreground text-sm rounded-xl hover:bg-primary-hover transition-all duration-200 shadow-sm hover:shadow font-medium"
                 >
                   Add Task
                 </button>
@@ -120,6 +120,7 @@ export default function TodoDashboard() {
 
       <div className="flex gap-2 mb-8 border-b-2 border-border animate-fade-in" style={{ animationDelay: '0.2s' }}>
         <button
+          type="button"
           onClick={() => setActiveTab("all")}
           className={`px-5 py-3 text-sm font-medium transition-all duration-200 relative ${
             activeTab === "all"
@@ -133,6 +134,7 @@ export default function TodoDashboard() {
           )}
         </button>
         <button
+          type="button"
           onClick={() => setActiveTab("pending")}
           className={`px-5 py-3 text-sm font-medium transition-all duration-200 relative ${
             activeTab === "pending"
@@ -151,6 +153,7 @@ export default function TodoDashboard() {
           )}
         </button>
         <button
+          type="button"
           onClick={() => setActiveTab("completed")}
           className={`px-5 py-3 text-sm font-medium transition-all duration-200 relative ${
             activeTab === "completed"
@@ -160,7 +163,7 @@ export default function TodoDashboard() {
         >
           Completed
           {completedCount > 0 && (
-            <span className="ml-2 px-2 py-0.5 text-xs bg-[#7A9D87]/10 text-[#7A9D87] rounded-full font-semibold">
+            <span className="ml-2 px-2 py-0.5 text-xs bg-chart-2/10 text-chart-2 rounded-full font-semibold">
               {completedCount}
             </span>
           )}
@@ -186,7 +189,7 @@ export default function TodoDashboard() {
             <div
               key={todo._id}
               className="group bg-card rounded-2xl p-5 border border-border hover:border-primary/30 hover:shadow-sm transition-all duration-200 animate-slide-in"
-              style={{ animationDelay: `${index * 0.05}s` }}
+              style={{ animationDelay: `${Math.min(index * 0.05, 0.4)}s` }}
             >
               {editingId === todo._id ? (
                 <div className="space-y-3">
@@ -206,12 +209,14 @@ export default function TodoDashboard() {
                   />
                   <div className="flex gap-2">
                     <button
+                      type="button"
                       onClick={handleSaveEdit}
-                      className="px-4 py-2 bg-primary text-primary-foreground text-sm rounded-xl hover:bg-[#B54F35] transition-all duration-200 font-medium"
+                      className="px-4 py-2 bg-primary text-primary-foreground text-sm rounded-xl hover:bg-primary-hover transition-all duration-200 font-medium"
                     >
                       Save
                     </button>
                     <button
+                      type="button"
                       onClick={handleCancelEdit}
                       className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
@@ -271,7 +276,7 @@ export default function TodoDashboard() {
                         {new Date(todo.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                       </span>
                       {todo.completedAt && (
-                        <span className="text-xs text-[#7A9D87] font-medium">
+                        <span className="text-xs text-chart-2 font-medium">
                           ✓ Completed {new Date(todo.completedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         </span>
                       )}
