@@ -274,11 +274,25 @@ export default function TodoDashboard() {
                     )}
                     <div className="flex items-center gap-4 mt-3">
                       <span className="text-xs text-muted-foreground">
-                        {new Date(todo.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        {new Date(todo.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                       </span>
                       {todo.completedAt && (
-                        <span className="text-xs text-chart-2 font-medium">
-                          ✓ Completed {new Date(todo.completedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        <span className="text-xs text-chart-2 font-medium flex items-center gap-1">
+                          <svg
+                            className="w-3 h-3"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            aria-hidden="true"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={3}
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                          Completed {new Date(todo.completedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                         </span>
                       )}
                     </div>
