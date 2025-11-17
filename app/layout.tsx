@@ -1,14 +1,8 @@
 import type { Metadata } from "next";
-import { Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ConvexClientProvider from "@/components/ConvexClientProvider";
 import { ClerkProvider } from "@clerk/nextjs";
 import ClientBody from "@/components/ClientBody";
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "VIBED",
@@ -26,32 +20,32 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body suppressHydrationWarning>
-        <ClientBody className={`${geistMono.variable} antialiased font-mona-regular`}>
+        <ClientBody className="antialiased">
           <ClerkProvider
             dynamic
             appearance={{
-              baseTheme: "dark",
               variables: {
-                colorPrimary: "#ffffff",
-                colorBackground: "#000000",
-                colorInputBackground: "#1a1a1a",
-                colorInputText: "#ffffff",
-                colorText: "#ffffff",
-                colorTextSecondary: "#b3b3b3",
-                colorNeutral: "#3a3a3a",
-                colorDanger: "#dc2626",
-                colorSuccess: "#10b981",
-                colorWarning: "#f59e0b",
-                borderRadius: "0.625rem",
+                colorPrimary: "#C85A3C",
+                colorBackground: "#FAF8F5",
+                colorInputBackground: "#FFFFFF",
+                colorInputText: "#1A1614",
+                colorText: "#1A1614",
+                colorTextSecondary: "#8B8682",
+                colorNeutral: "#E8E4DF",
+                colorDanger: "#D64545",
+                colorSuccess: "#7A9D87",
+                colorWarning: "#E8A87C",
+                borderRadius: "0.875rem",
+                fontFamily: "'Commissioner', system-ui, sans-serif",
               },
               elements: {
-                card: "bg-[#1a1a1a] border-[#3a3a3a]",
-                headerTitle: "text-white",
-                headerSubtitle: "text-[#b3b3b3]",
-                socialButtonsBlockButton: "border-[#3a3a3a] hover:bg-[#2a2a2a]",
-                formButtonPrimary: "bg-white text-black hover:bg-gray-200",
-                formFieldInput: "bg-[#1a1a1a] border-[#3a3a3a] text-white",
-                footerActionLink: "text-white hover:text-gray-300",
+                card: "bg-white border-[#E8E4DF] shadow-sm",
+                headerTitle: "text-[#1A1614] font-['Bricolage_Grotesque']",
+                headerSubtitle: "text-[#8B8682]",
+                socialButtonsBlockButton: "border-[#E8E4DF] hover:bg-[#F5F2EE]",
+                formButtonPrimary: "bg-[#C85A3C] text-white hover:bg-[#B54F35]",
+                formFieldInput: "bg-white border-[#E8E4DF] text-[#1A1614]",
+                footerActionLink: "text-[#C85A3C] hover:text-[#B54F35]",
               }
             }}
           >

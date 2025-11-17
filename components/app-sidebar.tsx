@@ -51,11 +51,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
+              className="data-[slot=sidebar-menu-button]:!p-3"
             >
-              <a href="/tasks">
-                <IconInnerShadowTop className="!size-5" />
-                <span className="text-base font-semibold">VIBED</span>
+              <a href="/tasks" className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
+                  <IconInnerShadowTop className="!size-4 text-primary-foreground" />
+                </div>
+                <span className="text-xl font-semibold tracking-tight">VIBED</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
