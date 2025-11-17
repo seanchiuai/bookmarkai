@@ -227,6 +227,7 @@ export default function TodoDashboard() {
               ) : (
                 <div className="flex items-start gap-4">
                   <button
+                    type="button"
                     onClick={() => toggleComplete({ id: todo._id })}
                     className={`mt-1.5 w-6 h-6 rounded-lg border-2 flex-shrink-0 transition-all duration-200 ${
                       todo.status === "completed"
@@ -284,6 +285,7 @@ export default function TodoDashboard() {
                   </div>
                   <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
                     <button
+                      type="button"
                       onClick={() => handleStartEdit(todo)}
                       className="p-2 text-muted-foreground hover:text-foreground hover:bg-secondary/50 rounded-lg transition-all duration-200"
                       title="Edit task"
@@ -303,6 +305,7 @@ export default function TodoDashboard() {
                       </svg>
                     </button>
                     <button
+                      type="button"
                       onClick={() => removeTodo({ id: todo._id })}
                       className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all duration-200"
                       title="Delete task"
