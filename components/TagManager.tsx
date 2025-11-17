@@ -13,7 +13,7 @@ export default function TagManager() {
   const [editName, setEditName] = useState("");
   const [editColor, setEditColor] = useState("");
 
-  const tags = useQuery(api.tags.list);
+  const tags = useQuery(api.tags.list, {});
   const createTag = useMutation(api.tags.create);
   const updateTag = useMutation(api.tags.update);
   const removeTag = useMutation(api.tags.remove);

@@ -14,8 +14,8 @@ export default function AddBookmarkForm() {
   const [selectedTagIds, setSelectedTagIds] = useState<Id<"tags">[]>([]);
 
   const createBookmark = useMutation(api.bookmarks.create);
-  const collections = useQuery(api.collections.list);
-  const tags = useQuery(api.tags.list);
+  const collections = useQuery(api.collections.list, {});
+  const tags = useQuery(api.tags.list, {});
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

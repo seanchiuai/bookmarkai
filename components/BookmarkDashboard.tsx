@@ -24,7 +24,7 @@ export default function BookmarkDashboard() {
   );
 
   const collections = useQuery(api.collections.list, {});
-  const tags = useQuery(api.tags.list);
+  const tags = useQuery(api.tags.list, {});
 
   const handleCollectionFilter = (collectionId?: Id<"collections">) => {
     setFilterView("collection");

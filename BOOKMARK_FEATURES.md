@@ -12,6 +12,7 @@ Bookmark AI is a comprehensive bookmark management system with AI-powered featur
 - **Card/Grid View**: Beautiful card-based display of bookmarks with preview images
 
 ### 2. Organization System
+
 - **Collections**: Create folders to group related bookmarks
   - Custom icons and colors
   - Nested collections support
@@ -19,7 +20,6 @@ Bookmark AI is a comprehensive bookmark management system with AI-powered featur
 - **Tags**: Label bookmarks with multiple tags
   - Custom colors for each tag
   - Quick filtering by tag
-  - Automatic tag suggestions
 
 ### 3. Filtering & Browsing
 - Browse all bookmarks
@@ -52,7 +52,8 @@ Bookmark AI is a comprehensive bookmark management system with AI-powered featur
 ## File Structure
 
 ### Backend (Convex)
-```
+
+```text
 convex/
 ├── schema.ts              # Database schema
 ├── bookmarks.ts           # Bookmark CRUD operations
@@ -63,7 +64,8 @@ convex/
 ```
 
 ### Frontend Components
-```
+
+```text
 components/
 ├── BookmarkDashboard.tsx   # Main dashboard with filtering
 ├── AddBookmarkForm.tsx     # URL input and metadata extraction
@@ -74,7 +76,8 @@ components/
 ```
 
 ### Services & Actions
-```
+
+```text
 lib/
 ├── metadata-extractor.ts   # URL metadata extraction service
 └── video-transcriber.ts    # Video transcription pipeline (placeholder)
@@ -85,7 +88,8 @@ app/actions/
 ```
 
 ### Pages
-```
+
+```text
 app/
 ├── bookmarks/page.tsx      # Main bookmarks page
 ├── organize/page.tsx       # Collections & tags management
@@ -95,6 +99,7 @@ app/
 ## API Integration Points
 
 ### Metadata Extraction
+
 The metadata extractor (`lib/metadata-extractor.ts`) fetches and parses:
 - Open Graph meta tags (`og:title`, `og:description`, `og:image`)
 - Twitter Card meta tags
@@ -102,6 +107,7 @@ The metadata extractor (`lib/metadata-extractor.ts`) fetches and parses:
 - Favicon URLs
 
 ### Video Transcription (To Be Implemented)
+
 Current placeholder in `lib/video-transcriber.ts` needs integration with:
 
 **For YouTube:**
@@ -124,6 +130,7 @@ Current placeholder in `lib/video-transcriber.ts` needs integration with:
 ## Usage
 
 ### Adding a Bookmark
+
 1. Navigate to `/bookmarks`
 2. Paste a URL in the input field
 3. Optionally select collection and tags (click "Show advanced options")
@@ -131,18 +138,21 @@ Current placeholder in `lib/video-transcriber.ts` needs integration with:
 5. Metadata is automatically extracted and displayed
 
 ### Organizing with Collections
+
 1. Navigate to `/organize`
 2. Create collections with custom names, icons, and colors
 3. Assign bookmarks to collections from the add form
 4. Filter by collection in the sidebar
 
 ### Managing Tags
+
 1. Navigate to `/organize`
 2. Create tags with custom names and colors
 3. Add multiple tags to bookmarks
 4. Filter bookmarks by tag
 
 ### Video Transcription
+
 1. Add a YouTube or Instagram Reel URL
 2. Open the bookmark
 3. Click "Generate Transcript"
@@ -152,12 +162,14 @@ Current placeholder in `lib/video-transcriber.ts` needs integration with:
 ## Future Enhancements
 
 ### Priority
+
 1. **Real Video Transcription**: Integrate with Whisper API or AssemblyAI
 2. **Browser Extension**: Quick-save clipper for browsers
 3. **Preview Snapshots**: Capture visual previews of web pages
 4. **Video Player Integration**: Embed YouTube/Instagram players with sync
 
 ### Nice to Have
+
 - Bookmark import/export
 - Sharing collections
 - Collaborative bookmarks
@@ -170,16 +182,19 @@ Current placeholder in `lib/video-transcriber.ts` needs integration with:
 ## Technical Notes
 
 ### Performance
+
 - All queries are scoped to the authenticated user
 - Indexes on userId, collectionId, and tagId for fast filtering
 - Lazy loading for large bookmark collections
 
 ### Security
+
 - Row-level security via Clerk authentication
 - All mutations verify user ownership
 - Server-side metadata fetching prevents XSS
 
 ### Scalability
+
 - Convex handles real-time updates automatically
 - Metadata extraction can be moved to background jobs
 - Transcription should be queued for large videos
@@ -187,7 +202,8 @@ Current placeholder in `lib/video-transcriber.ts` needs integration with:
 ## Development
 
 ### Environment Variables Needed
-```
+
+```bash
 # Frontend (.env.local)
 NEXT_PUBLIC_CONVEX_URL=https://your-project.convex.cloud
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
@@ -198,6 +214,7 @@ CLERK_JWT_ISSUER_DOMAIN=https://your-app.clerk.accounts.dev
 ```
 
 ### Running Locally
+
 ```bash
 npm install
 npm run dev
@@ -206,6 +223,7 @@ npm run dev
 This starts both Next.js frontend and Convex backend.
 
 ## Support
+
 For issues or questions, refer to:
 - [Convex Documentation](https://docs.convex.dev)
 - [Clerk Documentation](https://clerk.com/docs)

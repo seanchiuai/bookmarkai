@@ -9,8 +9,36 @@ export async function transcribeVideoAction(
   url: string,
   videoType: "youtube" | "instagram"
 ) {
+  // Validate URL input
+  const trimmedUrl = url?.trim();
+
+  if (!trimmedUrl) {
+    return {
+      success: false,
+      error: "URL is required",
+    };
+  }
+
+  // Validate URL format
   try {
-    const transcript = await transcribeVideo(url, videoType);
+    new URL(trimmedUrl);
+  } catch {
+    return {
+      success: false,
+      error: "Invalid URL format. Please enter a valid URL.",
+    };
+  }
+
+  // Validate videoType
+  if (videoType !== "youtube" && videoType !== "instagram") {
+    return {
+      success: false,
+      error: "Invalid video type. Must be 'youtube' or 'instagram'.",
+    };
+  }
+
+  try {
+    const transcript = await transcribeVideo(trimmedUrl, videoType);
 
     if (!transcript) {
       return {

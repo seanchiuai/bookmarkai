@@ -13,11 +13,11 @@ export default function OrganizePage() {
         </div>
 
         <div className="space-y-6">
-          <div className="animate-fade-in" style={{ animationDelay: "0.1s" }}>
+          <div className="animate-fade-in animate-delay-100">
             <CollectionManager />
           </div>
 
-          <div className="animate-fade-in" style={{ animationDelay: "0.2s" }}>
+          <div className="animate-fade-in animate-delay-200">
             <TagManager />
           </div>
         </div>
