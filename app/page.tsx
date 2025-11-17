@@ -28,8 +28,8 @@ function RedirectToDashboard() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="text-center">
-        <span className="text-xl font-mona-bold">VIBED</span>
+      <div className="text-center animate-fade-in">
+        <h1 className="text-3xl font-semibold tracking-tight">VIBED</h1>
         <p className="text-muted-foreground mt-2">Redirecting to tasks...</p>
       </div>
     </div>
@@ -38,20 +38,22 @@ function RedirectToDashboard() {
 
 function SignInForm() {
   return (
-    <div className="max-w-md mx-auto text-center">
-      <h1 className="text-3xl font-mona-heading mb-2">Welcome to VIBED</h1>
-      <p className="text-muted-foreground mb-8">Sign in to start organizing your tasks</p>
-      <div className="flex flex-col gap-3">
-        <SignInButton mode="modal">
-          <button className="w-full px-4 py-2.5 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity">
-            Sign in
-          </button>
-        </SignInButton>
-        <SignUpButton mode="modal">
-          <button className="w-full px-4 py-2.5 border border-border rounded-lg hover:bg-secondary transition-colors">
-            Create account
-          </button>
-        </SignUpButton>
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="max-w-md w-full text-center animate-fade-in">
+        <h1 className="text-5xl font-semibold mb-3 tracking-tight">VIBED</h1>
+        <p className="text-muted-foreground mb-12 text-lg">A minimal space for your tasks</p>
+        <div className="flex flex-col gap-3">
+          <SignInButton mode="modal">
+            <button type="button" className="w-full px-6 py-3.5 bg-primary text-primary-foreground rounded-xl hover:bg-primary-hover transition-all duration-200 shadow-sm hover:shadow font-medium">
+              Sign in
+            </button>
+          </SignInButton>
+          <SignUpButton mode="modal">
+            <button type="button" className="w-full px-6 py-3.5 border-2 border-border bg-white rounded-xl hover:bg-secondary transition-all duration-200 font-medium">
+              Create account
+            </button>
+          </SignUpButton>
+        </div>
       </div>
     </div>
   );
