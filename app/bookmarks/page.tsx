@@ -1,11 +1,15 @@
 import BookmarkDashboard from "@/components/BookmarkDashboard";
+import Chatbot from "@/components/Chatbot";
 
 export default function BookmarksPage() {
   return (
-    <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-      <div className="px-4 lg:px-6">
-        <BookmarkDashboard />
+    <>
+      <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+        <div className="px-4 lg:px-6">
+          <BookmarkDashboard />
+        </div>
       </div>
-    </div>
+      <Chatbot />
+    </>
   );
 }

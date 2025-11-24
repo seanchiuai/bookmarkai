@@ -65,6 +65,24 @@ export const get = query({
   },
 });
 
+// Find bookmarks by URL
+export const byUrl = query({
+  args: { url: v.string() },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      return [];
+    }
+
+    const bookmarks = await ctx.db
+      .query("bookmarks")
+      .withIndex("by_url", (q) => q.eq("url", args.url))
+      .collect();
+
+    return bookmarks.filter(b => b.userId === identity.subject);
+  },
+});
+
 // Create a new bookmark
 export const create = mutation({
   args: {
@@ -317,6 +335,90 @@ export const updateMetadataStatus = mutation({
       imageUrl: args.imageUrl !== undefined ? args.imageUrl : bookmark.imageUrl,
       faviconUrl: args.faviconUrl !== undefined ? args.faviconUrl : bookmark.faviconUrl,
       updatedAt: Date.now(),
+    });
+  },
+});
+
+// Update bookmark embedding
+export const updateEmbedding = mutation({
+  args: {
+    bookmarkId: v.id("bookmarks"),
+    embedding: v.array(v.float64()),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
+    const bookmark = await ctx.db.get(args.bookmarkId);
+    if (!bookmark || bookmark.userId !== identity.subject) {
+      throw new Error("Bookmark not found or unauthorized");
+    }
+
+    await ctx.db.patch(args.bookmarkId, {
+      embedding: args.embedding,
+      updatedAt: Date.now(),
+    });
+  },
+});
+
+// Create bookmark with embedding (internal function)
+export const createEmbeddingBookmark = mutation({
+  args: {
+    userId: v.string(),
+    url: v.string(),
+    title: v.optional(v.string()),
+    description: v.optional(v.string()),
+    faviconUrl: v.optional(v.string()),
+    isVideo: v.boolean(),
+    videoType: v.union(v.literal("youtube"), v.literal("instagram")),
+    collectionId: v.optional(v.id("collections")),
+    tagIds: v.array(v.id("tags")),
+    order: v.number(),
+    metadataStatus: v.union(
+      v.literal("pending"),
+      v.literal("processing"),
+      v.literal("completed"),
+      v.literal("failed")
+    ),
+    embedding: v.optional(v.array(v.float64())),
+  },
+  handler: async (ctx, args) => {
+    const bookmarkId = await ctx.db.insert("bookmarks", {
+      userId: args.userId,
+      url: args.url,
+      title: args.title,
+      description: args.description,
+      faviconUrl: args.faviconUrl,
+      isVideo: args.isVideo,
+      videoType: args.videoType,
+      collectionId: args.collectionId,
+      tagIds: args.tagIds,
+      order: args.order,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      metadataStatus: args.metadataStatus,
+      embedding: args.embedding,
+    });
+
+    return bookmarkId;
+  },
+});
+
+// Create bookmark-tag relationship
+export const createBookmarkTag = mutation({
+  args: {
+    userId: v.string(),
+    bookmarkId: v.id("bookmarks"),
+    tagId: v.id("tags"),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.insert("bookmarkTags", {
+      userId: args.userId,
+      bookmarkId: args.bookmarkId,
+      tagId: args.tagId,
+      createdAt: Date.now(),
     });
   },
 });
