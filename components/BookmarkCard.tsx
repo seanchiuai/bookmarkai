@@ -1,6 +1,6 @@
 "use client";
 
-import { Id } from "../convex/_generated/dataModel";
+import { Id, Doc } from "../convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { useState } from "react";
@@ -25,7 +25,7 @@ interface BookmarkCardProps {
 export default function BookmarkCard({ bookmark }: BookmarkCardProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const removeBookmark = useMutation(api.bookmarks.remove);
-  const tags = useQuery(api.tags.getForBookmark, { bookmarkId: bookmark._id });
+  const tags = useQuery(api.tags.getForBookmark, { bookmarkId: bookmark._id }) as Doc<"tags">[] | undefined;
 
   const handleDelete = async () => {
     try {

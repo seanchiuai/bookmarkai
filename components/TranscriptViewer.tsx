@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../convex/_generated/api";
-import { Id } from "../convex/_generated/dataModel";
+import { Id, Doc } from "../convex/_generated/dataModel";
 import { transcribeVideoAction } from "@/app/actions/transcription";
 
 interface TranscriptViewerProps {
@@ -21,7 +21,7 @@ export default function TranscriptViewer({
   const [currentTime, setCurrentTime] = useState(0);
   const [activeSegmentIndex, setActiveSegmentIndex] = useState(0);
 
-  const transcript = useQuery(api.transcripts.getForBookmark, { bookmarkId });
+  const transcript = useQuery(api.transcripts.getForBookmark, { bookmarkId }) as Doc<"transcripts"> | null | undefined;
   const createTranscript = useMutation(api.transcripts.create);
 
   const handleGenerateTranscript = async () => {

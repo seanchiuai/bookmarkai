@@ -3,14 +3,21 @@
 import { useState, useRef, useEffect } from "react";
 import { useAction } from "convex/react";
 import { api } from "../convex/_generated/api";
-import { Id } from "../convex/_generated/dataModel";
+
+interface BookmarkData {
+  _id: string;
+  url: string;
+  title?: string;
+  description?: string;
+  faviconUrl?: string;
+}
 
 interface Message {
   id: string;
   content: string;
   role: "user" | "assistant";
   timestamp: number;
-  bookmarks?: any[];
+  bookmarks?: BookmarkData[];
 }
 
 export default function Chatbot() {
@@ -64,10 +71,10 @@ export default function Chatbot() {
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: result.response,
+        content: result.response || "Sorry, I couldn't generate a response.",
         role: "assistant",
         timestamp: Date.now(),
-        bookmarks: result.bookmarks,
+        bookmarks: result.bookmarks as BookmarkData[] | undefined,
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
@@ -92,7 +99,7 @@ export default function Chatbot() {
     }
   };
 
-  const formatBookmarkLink = (bookmark: any) => {
+  const formatBookmarkLink = (bookmark: BookmarkData) => {
     const title = bookmark.title || new URL(bookmark.url).hostname;
     return (
       <a

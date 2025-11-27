@@ -20,20 +20,22 @@ export const list = query({
 
     // Filter by collection if specified
     if (args.collectionId !== undefined) {
+      const collectionId = args.collectionId;
       bookmarksQuery = ctx.db
         .query("bookmarks")
         .withIndex("by_user_and_collection", (q) =>
-          q.eq("userId", identity.subject).eq("collectionId", args.collectionId)
+          q.eq("userId", identity.subject).eq("collectionId", collectionId)
         );
     }
 
     const bookmarks = await bookmarksQuery.order("desc").collect();
 
     // Filter by tag if specified
-    if (args.tagId) {
+    if (args.tagId !== undefined) {
+      const tagId = args.tagId;
       const bookmarkTagRelations = await ctx.db
         .query("bookmarkTags")
-        .withIndex("by_tag", (q) => q.eq("tagId", args.tagId))
+        .withIndex("by_tag", (q) => q.eq("tagId", tagId))
         .collect();
 
       const bookmarkIdsWithTag = new Set(

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
-import { Id } from "../convex/_generated/dataModel";
+import { Id, Doc } from "../convex/_generated/dataModel";
 import AddBookmarkForm from "./AddBookmarkForm";
 import BookmarkCard from "./BookmarkCard";
 
@@ -21,10 +21,10 @@ export default function BookmarkDashboard() {
       : filterView === "tag"
       ? { tagId: selectedTagId }
       : {}
-  );
+  ) as Doc<"bookmarks">[] | undefined;
 
-  const collections = useQuery(api.collections.list, {});
-  const tags = useQuery(api.tags.list, {});
+  const collections = useQuery(api.collections.list, {}) as Doc<"collections">[] | undefined;
+  const tags = useQuery(api.tags.list, {}) as Doc<"tags">[] | undefined;
 
   const handleCollectionFilter = (collectionId?: Id<"collections">) => {
     setFilterView("collection");

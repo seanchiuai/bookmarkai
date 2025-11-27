@@ -2,7 +2,7 @@
 name: agent-convex
 description: Best practices for Convex backend implementation with proper CORS handling
 model: inherit
-color: blue
+color: orange
 ---
 
 # Agent: Convex Backend Implementation

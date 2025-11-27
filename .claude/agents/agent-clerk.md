@@ -2,6 +2,7 @@
 name: "Clerk Authentication Setup"
 description: "Set up Clerk authentication for your application"
 tools: ["npm", "filesystem", "env"]
+color: purple
 ---
 
 # Clerk Authentication Agent

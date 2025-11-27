@@ -1,7 +1,21 @@
 import { v } from "convex/values";
-import { mutation, query, action } from "./_generated/server";
-import { Id } from "./_generated/dataModel";
+import { mutation, action } from "./_generated/server";
+import { api } from "./_generated/api";
 import OpenAI from "openai";
+
+interface BookmarkResult {
+  bookmark: {
+    _id: string;
+    url: string;
+    title?: string;
+    description?: string;
+    faviconUrl?: string;
+    transcriptId?: string;
+  };
+  transcript?: {
+    fullText: string;
+  } | null;
+}
 
 // Search bookmarks using vector similarity (RAG)
 export const searchBookmarks = action({
@@ -9,7 +23,7 @@ export const searchBookmarks = action({
     query: v.string(),
     maxResults: v.optional(v.number()),
   },
-  handler: async (ctx, args): Promise<Array<{bookmark: any, transcript?: any}>> => {
+  handler: async (ctx, args): Promise<BookmarkResult[]> => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       return [];
@@ -37,25 +51,35 @@ export const searchBookmarks = action({
     const results = await ctx.vectorSearch("bookmarks", "by_embedding", {
       vector: queryEmbedding,
       limit: args.maxResults || 10,
-      filter: (doc) => doc.userId === identity.subject,
+      filter: (q) => q.eq("userId", identity.subject),
     });
 
     // Get full bookmark data and transcripts
-    const bookmarksWithContext = await Promise.all(
+    const bookmarksWithContext: (BookmarkResult | null)[] = await Promise.all(
       results.map(async (result) => {
-        const bookmark = await ctx.runQuery("bookmarks:get", { id: result._id });
+        const bookmark = await ctx.runQuery(api.bookmarks.get, { id: result._id });
         if (!bookmark) return null;
 
         // Get transcript if it exists
         const transcript = bookmark.transcriptId
-          ? await ctx.runQuery("transcripts:getForBookmark", { bookmarkId: bookmark._id })
+          ? await ctx.runQuery(api.transcripts.getForBookmark, { bookmarkId: bookmark._id })
           : null;
 
-        return { bookmark, transcript };
+        return {
+          bookmark: {
+            _id: bookmark._id,
+            url: bookmark.url,
+            title: bookmark.title,
+            description: bookmark.description,
+            faviconUrl: bookmark.faviconUrl,
+            transcriptId: bookmark.transcriptId,
+          },
+          transcript: transcript ? { fullText: transcript.fullText } : null
+        };
       })
     );
 
-    return bookmarksWithContext.filter(item => item !== null);
+    return bookmarksWithContext.filter((item): item is BookmarkResult => item !== null);
   },
 });
 
@@ -131,7 +155,7 @@ export const updateBookmarkEmbedding = action({
       throw new Error("Not authenticated");
     }
 
-    const bookmark = await ctx.runQuery("bookmarks:get", { id: args.bookmarkId });
+    const bookmark = await ctx.runQuery(api.bookmarks.get, { id: args.bookmarkId });
     if (!bookmark || bookmark.userId !== identity.subject) {
       throw new Error("Bookmark not found or unauthorized");
     }
@@ -152,7 +176,7 @@ export const updateBookmarkEmbedding = action({
       const embedding = response.data[0].embedding;
 
       // Update the bookmark with the embedding
-      await ctx.runMutation("bookmarks:updateEmbedding", {
+      await ctx.runMutation(api.bookmarks.updateEmbedding, {
         bookmarkId: args.bookmarkId,
         embedding,
       });
@@ -170,7 +194,7 @@ export const chatWithBookmarks = action({
   args: {
     message: v.string(),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<{ response?: string; bookmarks?: unknown[]; error?: string }> => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       return { error: "Not authenticated" };
@@ -178,28 +202,28 @@ export const chatWithBookmarks = action({
 
     try {
       // Search for relevant bookmarks
-      const searchResults = await ctx.runAction("ragBookmarks:searchBookmarks", {
+      const searchResults = await ctx.runAction(api.ragBookmarks.searchBookmarks, {
         query: args.message,
         maxResults: 5,
       });
 
       // Prepare context for AI
-      const context = searchResults.map(item => ({
-        title: item.bookmark.title,
+      const context = searchResults.map((item) => ({
+        title: item.bookmark.title || "",
         description: item.bookmark.description,
         url: item.bookmark.url,
         transcript: item.transcript?.fullText,
       }));
 
       // Generate AI response
-      const aiResponse = await ctx.runAction("ragBookmarks:generateChatResponse", {
+      const aiResponse = await ctx.runAction(api.ragBookmarks.generateChatResponse, {
         userMessage: args.message,
         context,
       });
 
       return {
         response: aiResponse,
-        bookmarks: searchResults.map(item => item.bookmark),
+        bookmarks: searchResults.map((item) => item.bookmark),
       };
     } catch (error) {
       console.error("Chat with bookmarks failed:", error);

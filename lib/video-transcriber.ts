@@ -60,7 +60,7 @@ function extractInstagramReelId(url: string): string | null {
  */
 async function transcribeYouTubeVideo(
   videoId: string,
-  url: string
+  _url: string
 ): Promise<VideoTranscript> {
   console.log(`Transcribing YouTube video: ${videoId}`);
 
@@ -104,7 +104,7 @@ async function transcribeYouTubeVideo(
  */
 async function transcribeInstagramReel(
   reelId: string,
-  url: string
+  _url: string
 ): Promise<VideoTranscript> {
   console.log(`Transcribing Instagram Reel: ${reelId}`);
 
@@ -166,8 +166,8 @@ export async function transcribeVideo(
  * Check if transcription is available for a video
  */
 export async function checkTranscriptionAvailability(
-  url: string,
-  videoType: "youtube" | "instagram"
+  _url: string,
+  _videoType: "youtube" | "instagram"
 ): Promise<boolean> {
   // PLACEHOLDER: In production, check if captions/transcription is available
   // For now, assume all videos can be transcribed

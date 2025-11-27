@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
-import { Id } from "../convex/_generated/dataModel";
+import { Id, Doc } from "../convex/_generated/dataModel";
 
 export default function CollectionManager() {
   const [isCreating, setIsCreating] = useState(false);
@@ -17,7 +17,7 @@ export default function CollectionManager() {
   const [editColor, setEditColor] = useState("");
   const [editDescription, setEditDescription] = useState("");
 
-  const collections = useQuery(api.collections.list, {});
+  const collections = useQuery(api.collections.list, {}) as Doc<"collections">[] | undefined;
   const createCollection = useMutation(api.collections.create);
   const updateCollection = useMutation(api.collections.update);
   const removeCollection = useMutation(api.collections.remove);

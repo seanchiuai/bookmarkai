@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
-import { Id } from "../convex/_generated/dataModel";
+import { Id, Doc } from "../convex/_generated/dataModel";
 import { extractUrlMetadata } from "@/app/actions/metadata";
 
 export default function AddBookmarkForm() {
@@ -14,8 +14,8 @@ export default function AddBookmarkForm() {
   const [selectedTagIds, setSelectedTagIds] = useState<Id<"tags">[]>([]);
 
   const createBookmark = useMutation(api.bookmarks.create);
-  const collections = useQuery(api.collections.list, {});
-  const tags = useQuery(api.tags.list, {});
+  const collections = useQuery(api.collections.list, {}) as Doc<"collections">[] | undefined;
+  const tags = useQuery(api.tags.list, {}) as Doc<"tags">[] | undefined;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,7 +119,7 @@ export default function AddBookmarkForm() {
                   className="w-full px-4 py-2 bg-secondary/30 border-none outline-none rounded-xl focus:bg-secondary/50 transition-colors"
                 >
                   <option value="">No collection</option>
-                  {collections.map((collection) => (
+                  {collections?.map((collection) => (
                     <option key={collection._id} value={collection._id}>
                       {collection.icon} {collection.name}
                     </option>

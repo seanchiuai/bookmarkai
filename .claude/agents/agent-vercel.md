@@ -1,288 +1,515 @@
 ---
-name: agent-vercel
-description: Best practices for Vercel deployment and production shipping
-model: inherit
+name: "Vercel Deployment"
+description: "Implementation guide for deploying Next.js app to Vercel"
+tools: ["npm", "filesystem", "env"]
 color: black
 ---
 
-# Agent: Vercel Deployment
+# Vercel Deployment Agent
 
-Best practices for deploying applications with Vercel, including production deployments, environment configuration, and common deployment patterns.
+## Mission
+Deploy Next.js bookmark manager to Vercel with proper environment variables, preview deployments, and production configuration.
 
-## 🚀 CRITICAL: Production Deployment
+## Stack Context
+- **Platform**: Vercel (optimized for Next.js)
+- **Features**: Automatic deployments, preview URLs, edge functions
+- **CLI**: `vercel` command-line tool
+- **Integration**: GitHub (automatic deployments on push)
 
-### Basic Deployment Commands
+## Implementation Steps
+
+### 1. Install Vercel CLI
+```bash
+npm install -g vercel
+```
+
+### 2. Login to Vercel
+```bash
+vercel login
+```
+
+Follow prompts to authenticate via email or GitHub.
+
+### 3. Project Structure Check
+
+Verify your project has these files:
+
+**Required Files**:
+- `package.json` - Dependencies and build scripts
+- `next.config.ts` - Next.js configuration
+- `tsconfig.json` - TypeScript configuration
+- `.gitignore` - Excludes `.env.local`, `node_modules`, `.vercel`
+
+**Next.js Configuration**:
+```typescript
+// next.config.ts
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**.convex.cloud",
+      },
+      {
+        protocol: "https",
+        hostname: "**.convex.site",
+      },
+      {
+        protocol: "https",
+        hostname: "www.google.com", // Google Favicons
+      },
+    ],
+  },
+  // Enable React strict mode for development
+  reactStrictMode: true,
+  // Disable x-powered-by header
+  poweredByHeader: false,
+};
+
+export default nextConfig;
+```
+
+### 4. Configure Environment Variables
+
+**Local Development** (`.env.local`):
+```bash
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
+
+# Convex Backend
+NEXT_PUBLIC_CONVEX_URL=https://your-deployment.convex.cloud
+CONVEX_DEPLOYMENT=dev:your-deployment
+
+# OpenAI API
+OPENAI_API_KEY=sk-proj-...
+
+# Microlink API (Optional)
+MICROLINK_API_KEY=your_api_key_here
+```
+
+**Vercel Environment Variables**:
+
+Add these in Vercel Dashboard → Project Settings → Environment Variables:
+
+| Variable | Environment | Value |
+|----------|-------------|-------|
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Production, Preview, Development | `pk_live_...` (prod) or `pk_test_...` (preview) |
+| `CLERK_SECRET_KEY` | Production, Preview, Development | `sk_live_...` (prod) or `sk_test_...` (preview) |
+| `NEXT_PUBLIC_CONVEX_URL` | Production, Preview, Development | `https://your-deployment.convex.cloud` |
+| `CONVEX_DEPLOYMENT` | Production | `prod:your-deployment` |
+| `OPENAI_API_KEY` | Production, Preview, Development | `sk-proj-...` |
+| `MICROLINK_API_KEY` | Production, Preview | Your API key (optional) |
+
+**Security Notes**:
+- Never commit `.env.local` to git
+- Use `NEXT_PUBLIC_` prefix ONLY for client-side variables
+- Keep API keys private (no `NEXT_PUBLIC_` prefix)
+
+### 5. Initial Deployment (CLI)
 
 ```bash
-# Preview deployment (creates unique URL)
+# From project root
 vercel
 
-# Production deployment
+# Follow prompts:
+# - Set up and deploy? [Y/n] Y
+# - Which scope? [your-username]
+# - Link to existing project? [y/N] N
+# - What's your project's name? bookmark-manager
+# - In which directory is your code located? ./
+# - Want to override the settings? [y/N] N
+```
+
+This creates:
+- `.vercel` directory (add to `.gitignore`)
+- Initial deployment with preview URL
+- Project linked to Vercel account
+
+### 6. Set Up GitHub Integration (Recommended)
+
+**Connect GitHub Repository**:
+
+1. Go to Vercel Dashboard → Add New Project
+2. Import Git Repository → Select your repo
+3. Configure Project:
+   - Framework Preset: Next.js
+   - Root Directory: `./`
+   - Build Command: `npm run build`
+   - Output Directory: `.next`
+   - Install Command: `npm install`
+
+4. Add Environment Variables (same as step 4)
+5. Deploy
+
+**Automatic Deployments**:
+- `main` branch → Production deployment
+- Other branches → Preview deployments
+- Pull requests → Preview deployments with unique URLs
+
+### 7. Production Deployment
+
+**Via CLI**:
+```bash
+# Deploy to production
 vercel --prod
-
-# Deploy with specific configuration
-vercel --prod --yes  # Skip confirmation prompts
 ```
 
-### Common Deployment Issues & Solutions
-
-**ERROR:** `Error: No project linked. Run 'vercel link' to connect to a project`
-
-**Solution:** Link your project first:
+**Via Git**:
 ```bash
-vercel link
-# Follow prompts to connect to existing or create new project
+# Merge to main branch
+git checkout main
+git merge feature-branch
+git push origin main
+
+# Vercel automatically deploys to production
 ```
 
-**ERROR:** `Build failed: Module not found`
+### 8. Configure Build Settings (Optional)
 
-**Solution:** Ensure all dependencies are in package.json:
-```bash
-# Install missing dependencies
-npm install
+**Vercel Dashboard → Project Settings → General**:
 
-# Commit package.json and package-lock.json
-git add package.json package-lock.json
-git commit -m "Update dependencies"
-
-# Deploy again
-vercel --prod
+```
+Build & Development Settings:
+├── Framework Preset: Next.js
+├── Root Directory: ./
+├── Build Command: npm run build
+├── Output Directory: .next
+├── Install Command: npm install
+└── Development Command: npm run dev
 ```
 
-## 🔧 IMPORTANT: Environment Variables
-
-### Setting Environment Variables
-
-```bash
-# Add environment variable for all environments
-vercel env add SECRET_KEY
-
-# Add for specific environments
-vercel env add DATABASE_URL production
-vercel env add DATABASE_URL development
-vercel env add DATABASE_URL preview
-
-# Pull environment variables to .env.local
-vercel env pull
-```
-
-### Environment Variable Patterns
-
-```bash
-# Production secrets
-vercel env add DATABASE_URL production
-vercel env add API_SECRET production
-
-# Public variables (accessible in browser)
-vercel env add NEXT_PUBLIC_API_URL
-vercel env add NEXT_PUBLIC_SITE_URL
-```
-
-## 📦 HELPFUL: Build Configuration
-
-### vercel.json Configuration
-
+**Ignore Build Step (Optional)**:
+Create `vercel.json` to customize:
 ```json
 {
   "buildCommand": "npm run build",
-  "outputDirectory": "dist",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "nextjs",
   "regions": ["iad1"],
-  "functions": {
-    "app/api/*": {
-      "maxDuration": 10
-    }
-  },
-  "redirects": [
+  "rewrites": [
     {
-      "source": "/old-path",
-      "destination": "/new-path",
-      "permanent": true
+      "source": "/(.*)",
+      "destination": "/"
     }
-  ],
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        }
-      ]
-    }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
 ```
 
-### Next.js Specific Configuration
+### 9. Custom Domain (Optional)
 
-```json
-{
-  "framework": "nextjs",
-  "buildCommand": "next build",
-  "devCommand": "next dev -p 3000",
-  "outputDirectory": ".next",
-  "regions": ["iad1"],
-  "functions": {
-    "app/api/route.ts": {
-      "maxDuration": 60,
-      "memory": 1024
-    }
-  }
-}
+**Add Domain**:
+1. Vercel Dashboard → Project → Settings → Domains
+2. Add Domain → Enter domain name (e.g., `bookmarks.example.com`)
+3. Configure DNS:
+   - Add CNAME record: `bookmarks` → `cname.vercel-dns.com`
+   - Or A record: `@` → Vercel IP address
+
+4. Wait for DNS propagation (~24 hours)
+
+**SSL Certificate**:
+- Automatically provisioned by Vercel
+- Auto-renews before expiration
+
+### 10. Environment-Specific Configurations
+
+**Preview vs Production**:
+
+```typescript
+// lib/config.ts
+export const config = {
+  isProduction: process.env.VERCEL_ENV === "production",
+  isPreview: process.env.VERCEL_ENV === "preview",
+  isDevelopment: process.env.NODE_ENV === "development",
+
+  // Use different Convex deployments
+  convexUrl: process.env.NEXT_PUBLIC_CONVEX_URL,
+
+  // Enable debug logging in preview/dev
+  enableDebugLogs: process.env.VERCEL_ENV !== "production",
+};
 ```
 
-## 🎯 HELPFUL: Deployment Workflow
+**Convex Deployments**:
+```bash
+# Production deployment
+CONVEX_DEPLOYMENT=prod:bookmark-manager
 
-### Complete Deployment Process
+# Preview deployment (separate data)
+CONVEX_DEPLOYMENT=dev:bookmark-manager-preview
+```
+
+## Deployment Commands
+
+### CLI Commands
 
 ```bash
-# 1. Install Vercel CLI (if not installed)
-npm i -g vercel
-
-# 2. Login to Vercel
-vercel login
-
-# 3. Link project (first time)
-vercel link
-
-# 4. Set environment variables
-vercel env add DATABASE_URL production
-vercel env add NEXT_PUBLIC_API_URL
-
-# 5. Test with preview deployment
+# Deploy to preview (default)
 vercel
 
-# 6. Deploy to production
+# Deploy to production
 vercel --prod
 
-# 7. Check deployment status
-vercel ls
+# Pull environment variables to local
+vercel env pull
 
-# 8. View logs
-vercel logs
-```
+# Add environment variable
+vercel env add MY_KEY production
 
-### Domain Management
+# List deployments
+vercel list
 
-```bash
-# Add custom domain
-vercel domains add example.com
-
-# List domains
-vercel domains ls
-
-# Remove domain
-vercel domains rm example.com
-
-# Inspect domain configuration
-vercel domains inspect example.com
-```
-
-## 🔍 HELPFUL: Debugging & Monitoring
-
-### Viewing Logs
-
-```bash
-# View recent logs
-vercel logs
-
-# View specific deployment logs
+# View logs
 vercel logs [deployment-url]
 
-# Follow logs in real-time
-vercel logs --follow
-
-# Filter by function
-vercel logs --filter="app/api/user"
+# Remove deployment
+vercel remove [deployment-id]
 ```
 
-### Rollback Deployments
+### Environment Management
 
 ```bash
-# List all deployments
-vercel ls
+# Pull all environment variables
+vercel env pull .env.local
 
-# Promote previous deployment to production
-vercel promote [deployment-url]
+# Pull specific environment
+vercel env pull --environment=production
 
-# Remove deployment
-vercel rm [deployment-url]
+# Add variable to specific environment
+vercel env add OPENAI_API_KEY production
+
+# List all environment variables
+vercel env ls
 ```
 
-## ⚡ HELPFUL: Performance Optimization
+## Deployment Workflow
+
+### Development → Preview → Production
+
+```bash
+# 1. Develop locally
+npm run dev
+
+# 2. Create feature branch
+git checkout -b feature/new-feature
+
+# 3. Commit changes
+git add .
+git commit -m "Add new feature"
+
+# 4. Push to GitHub
+git push origin feature/new-feature
+
+# 5. Vercel automatically creates preview deployment
+# Preview URL: https://bookmark-manager-git-feature-new-feature-username.vercel.app
+
+# 6. Test preview deployment
+# Review changes, test functionality
+
+# 7. Merge to main (via PR)
+gh pr create --title "Add new feature" --body "Description"
+gh pr merge
+
+# 8. Vercel automatically deploys to production
+# Production URL: https://bookmark-manager.vercel.app
+```
+
+## Performance Optimization
 
 ### Edge Functions
 
+**Enable Edge Runtime** for faster response times:
+
 ```typescript
-// app/api/edge-function/route.ts
-export const runtime = 'edge'; // Use Edge Runtime
+// app/api/route.ts
+export const runtime = "edge"; // Enable edge runtime
 
 export async function GET(request: Request) {
-  return new Response('Hello from the Edge!', {
-    status: 200,
-    headers: {
-      'content-type': 'text/plain',
-    },
-  });
+  // API logic runs on edge network
 }
 ```
 
 ### Image Optimization
 
-```javascript
-// next.config.js
-module.exports = {
-  images: {
-    domains: ['example.com'],
-    formats: ['image/avif', 'image/webp'],
+**Already configured in `next.config.ts`**:
+- Automatic image optimization
+- WebP format conversion
+- Lazy loading
+- Remote image domains allowed
+
+### Caching Strategy
+
+**Vercel automatically caches**:
+- Static assets (CSS, JS, images)
+- API responses (with proper headers)
+- Next.js static pages
+
+**Custom Cache Headers**:
+```typescript
+// app/api/route.ts
+export async function GET(request: Request) {
+  return new Response(JSON.stringify(data), {
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "s-maxage=60, stale-while-revalidate",
+    },
+  });
+}
+```
+
+## Monitoring & Analytics
+
+### Vercel Analytics
+
+**Enable Analytics**:
+1. Vercel Dashboard → Project → Analytics
+2. Enable Web Analytics (free tier: 100k events/month)
+
+**Add to Next.js**:
+```bash
+npm install @vercel/analytics
+```
+
+```typescript
+// app/layout.tsx
+import { Analytics } from "@vercel/analytics/react";
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>
+        {children}
+        <Analytics />
+      </body>
+    </html>
+  );
+}
+```
+
+### Vercel Speed Insights
+
+**Enable Speed Insights**:
+```bash
+npm install @vercel/speed-insights
+```
+
+```typescript
+// app/layout.tsx
+import { SpeedInsights } from "@vercel/speed-insights/next";
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>
+        {children}
+        <SpeedInsights />
+      </body>
+    </html>
+  );
+}
+```
+
+## Troubleshooting
+
+### Common Build Errors
+
+**Error: Environment variable not found**
+```
+Solution:
+1. Check Vercel Dashboard → Environment Variables
+2. Ensure variable is added to correct environment
+3. Redeploy with: vercel --prod
+```
+
+**Error: Module not found**
+```
+Solution:
+1. Check package.json dependencies
+2. Clear cache: vercel --force
+3. Ensure all imports use @/* aliases
+```
+
+**Error: Build timeout (45 minutes)**
+```
+Solution:
+1. Optimize build performance
+2. Remove unused dependencies
+3. Enable output caching in next.config.ts
+```
+
+### Deployment Issues
+
+**Preview deployment not created**
+```
+Solution:
+1. Check Vercel GitHub integration
+2. Verify repository permissions
+3. Re-connect repository in Vercel Dashboard
+```
+
+**Production deployment failed**
+```
+Solution:
+1. Check build logs: vercel logs [deployment-url]
+2. Test build locally: npm run build
+3. Fix errors and redeploy
+```
+
+## Security Best Practices
+
+### Environment Variables
+- Never expose secrets in client-side code
+- Use `NEXT_PUBLIC_` prefix only for public variables
+- Rotate API keys regularly
+- Use separate keys for production/preview
+
+### Headers
+
+**Add security headers** in `next.config.ts`:
+```typescript
+const nextConfig: NextConfig = {
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+          {
+            key: "X-Frame-Options",
+            value: "DENY",
+          },
+          {
+            key: "X-XSS-Protection",
+            value: "1; mode=block",
+          },
+        ],
+      },
+    ];
   },
 };
 ```
 
-## 🛠️ HELPFUL: Common Commands Reference
-
-| Command | Description |
-|---------|------------|
-| `vercel` | Deploy preview |
-| `vercel --prod` | Deploy to production |
-| `vercel dev` | Run development server |
-| `vercel build` | Build project locally |
-| `vercel env pull` | Download environment variables |
-| `vercel env ls` | List environment variables |
-| `vercel domains ls` | List domains |
-| `vercel logs` | View deployment logs |
-| `vercel ls` | List deployments |
-| `vercel inspect [url]` | Inspect deployment |
-| `vercel rm [url]` | Remove deployment |
-| `vercel whoami` | Show current user |
-| `vercel logout` | Logout from CLI |
-| `vercel alias` | Manage deployment aliases |
-| `vercel secrets` | Manage secrets (deprecated, use env) |
-
-## 🚨 Quick Troubleshooting
-
-| Error | Cause | Fix |
-|-------|-------|-----|
-| Build failed | Missing dependencies | Check package.json and install |
-| 404 after deploy | Wrong output directory | Check vercel.json configuration |
-| Environment variables undefined | Not set for environment | Use `vercel env add` for all environments |
-| Function timeout | Execution too long | Increase maxDuration in vercel.json |
-| CORS errors | Missing headers | Add headers in vercel.json |
-| No project linked | Not connected to Vercel | Run `vercel link` |
-
 ## Testing Checklist
+- [ ] Project builds successfully locally (`npm run build`)
+- [ ] All environment variables configured in Vercel
+- [ ] Preview deployment working
+- [ ] Production deployment successful
+- [ ] Custom domain configured (if applicable)
+- [ ] SSL certificate active
+- [ ] Analytics enabled
+- [ ] Image optimization working
+- [ ] API routes responding correctly
+- [ ] Authentication working in production
 
-- [ ] Preview deployment works (`vercel`)
-- [ ] Production deployment works (`vercel --prod`)
-- [ ] Environment variables are set correctly
-- [ ] Custom domain is configured (if applicable)
-- [ ] API routes respond correctly
-- [ ] Static assets load properly
-- [ ] Redirects work as expected
-- [ ] Edge functions deploy (if used)
+## Resources
+- [Vercel Documentation](https://vercel.com/docs)
+- [Next.js Deployment Guide](https://nextjs.org/docs/deployment)
+- [Vercel CLI Reference](https://vercel.com/docs/cli)
+- [Environment Variables Guide](https://vercel.com/docs/projects/environment-variables)
+- [Vercel Analytics](https://vercel.com/analytics)
