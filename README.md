@@ -84,16 +84,31 @@ CLERK_SECRET_KEY=sk_test_...
 - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`: Clerk dashboard → API Keys → Publishable key
 - `CLERK_SECRET_KEY`: Clerk dashboard → API Keys → Secret key
 
+### 5a. OpenAI API Key (Required for RAG & AI Features)
+
+The bookmark app includes AI-powered features (semantic search and chatbot). You'll need an OpenAI API key:
+
+1. **Get your OpenAI API key**: Go to [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
+2. **Add to Convex environment variables** (not .env.local):
+   - Go to your [Convex dashboard](https://dashboard.convex.dev)
+   - Select your project
+   - Go to **Settings** → **Environment Variables**
+   - Add: `OPENAI_API_KEY` with your key (e.g., `sk-...`)
+
+**Note**: The OpenAI key must be set in the Convex dashboard (server-side), not in your local `.env.local` file, as it's used by Convex actions.
+
 ### 6. Configure Convex Environment Variables
 
 1. Go to your [Convex dashboard](https://dashboard.convex.dev)
 2. Select your project
 3. Go to **"Settings"** → **"Environment Variables"**
-4. Add this variable:
+4. Add these variables:
    ```
    CLERK_JWT_ISSUER_DOMAIN=https://your-app.clerk.accounts.dev
+   OPENAI_API_KEY=sk-...
    ```
-   (Replace with your actual Clerk issuer domain from step 4)
+   - Replace `CLERK_JWT_ISSUER_DOMAIN` with your actual Clerk issuer domain from step 4
+   - Replace `OPENAI_API_KEY` with your OpenAI API key from step 5a
 
 ### 7. Update Convex Auth Config
 

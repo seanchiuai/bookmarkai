@@ -179,10 +179,11 @@ export const update = mutation({
 
     // If updating name, check for duplicates
     if (args.name !== undefined && args.name !== tag.name) {
+      const newName = args.name;
       const existing = await ctx.db
         .query("tags")
         .withIndex("by_user_and_name", (q) =>
-          q.eq("userId", identity.subject).eq("name", args.name)
+          q.eq("userId", identity.subject).eq("name", newName)
         )
         .first();
 

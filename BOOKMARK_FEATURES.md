@@ -1,17 +1,38 @@
 # Bookmark AI - Feature Documentation
 
 ## Overview
-Bookmark AI is a comprehensive bookmark management system with AI-powered features for organizing and transcribing video content.
+Bookmark AI is a comprehensive bookmark management system with AI-powered features including RAG (Retrieval-Augmented Generation) for semantic search, an intelligent chatbot assistant, and video transcription capabilities.
 
 ## Implemented Features
 
-### 1. Core Bookmark Management
+### 1. AI-Powered Features (NEW)
+
+#### **RAG Semantic Search**
+- **Vector Embeddings**: Uses OpenAI's text-embedding-3-small model to generate 1536-dimensional embeddings
+- **Semantic Search**: Find bookmarks by meaning, not just keywords
+- **Vector Database**: Convex vector index for fast similarity search
+- **Context-Aware**: Searches across bookmark titles, descriptions, URLs, and video transcripts
+
+#### **AI Chatbot Assistant**
+- **Conversational Interface**: Chat with your bookmarks in natural language
+- **Contextual Responses**: GPT-4o-mini provides intelligent answers based on your saved content
+- **Bookmark References**: AI responses include numbered references to relevant bookmarks
+- **Transcript Integration**: Searches through video transcripts for comprehensive answers
+- **Floating Widget**: Minimizable chat interface that doesn't interfere with browsing
+
+**Example Queries:**
+- "What are my bookmarks about machine learning?"
+- "Find videos about React hooks"
+- "Show me articles I saved about TypeScript"
+- "What did that YouTube video say about performance?"
+
+### 2. Core Bookmark Management
 - **Quick Save**: Paste any URL to automatically extract metadata (title, description, images, favicon)
 - **Smart Detection**: Automatically identifies YouTube and Instagram Reel videos
 - **Metadata Extraction**: Uses Open Graph and HTML meta tags to pull rich preview data
 - **Card/Grid View**: Beautiful card-based display of bookmarks with preview images
 
-### 2. Organization System
+### 3. Organization System
 
 - **Collections**: Create folders to group related bookmarks
   - Custom icons and colors
@@ -20,15 +41,16 @@ Bookmark AI is a comprehensive bookmark management system with AI-powered featur
 - **Tags**: Label bookmarks with multiple tags
   - Custom colors for each tag
   - Quick filtering by tag
+- **AI-Enhanced Organization**: Embeddings enable semantic clustering and discovery
 
-### 3. Filtering & Browsing
+### 4. Filtering & Browsing
 - Browse all bookmarks
 - Filter by collection
 - Filter by tag
 - Sidebar navigation for easy access
 - No search needed - organize visually
 
-### 4. Video Transcription (Placeholder)
+### 5. Video Transcription (Placeholder)
 - Transcript generation for YouTube videos
 - Transcript generation for Instagram Reels
 - Time-stamped segments
@@ -44,10 +66,12 @@ Bookmark AI is a comprehensive bookmark management system with AI-powered featur
 
 ### Tables
 - **bookmarks**: Core bookmark data with metadata
+  - **embedding** (new): Vector embeddings for RAG semantic search (1536 dimensions)
+  - Vector index on `embedding` field filtered by `userId`
 - **collections**: Folder organization
 - **tags**: Tag definitions
 - **bookmarkTags**: Many-to-many relationship between bookmarks and tags
-- **transcripts**: Video transcription data with time-stamped segments
+- **transcripts**: Video transcription data with time-stamped segments (searchable via RAG)
 
 ## File Structure
 
@@ -55,8 +79,9 @@ Bookmark AI is a comprehensive bookmark management system with AI-powered featur
 
 ```text
 convex/
-├── schema.ts              # Database schema
+├── schema.ts              # Database schema with vector index
 ├── bookmarks.ts           # Bookmark CRUD operations
+├── ragBookmarks.ts        # RAG search & AI chat actions (NEW)
 ├── collections.ts         # Collection management
 ├── tags.ts                # Tag management
 ├── transcripts.ts         # Transcript management
@@ -68,6 +93,7 @@ convex/
 ```text
 components/
 ├── BookmarkDashboard.tsx   # Main dashboard with filtering
+├── Chatbot.tsx             # AI chatbot assistant (NEW)
 ├── AddBookmarkForm.tsx     # URL input and metadata extraction
 ├── BookmarkCard.tsx        # Individual bookmark display
 ├── CollectionManager.tsx   # Collection CRUD interface
@@ -129,6 +155,20 @@ Current placeholder in `lib/video-transcriber.ts` needs integration with:
 
 ## Usage
 
+### Using the AI Chatbot
+
+1. Navigate to `/bookmarks`
+2. Click the chat widget in the bottom-right corner
+3. Ask natural language questions about your bookmarks:
+   - "What are my bookmarks about React?"
+   - "Find the video about TypeScript generics"
+   - "Show me articles about database design"
+4. The AI will:
+   - Search your bookmarks semantically
+   - Provide intelligent answers with context
+   - Reference specific bookmarks with [1], [2] numbers
+   - Include video transcripts in responses
+
 ### Adding a Bookmark
 
 1. Navigate to `/bookmarks`
@@ -136,6 +176,7 @@ Current placeholder in `lib/video-transcriber.ts` needs integration with:
 3. Optionally select collection and tags (click "Show advanced options")
 4. Click "Save"
 5. Metadata is automatically extracted and displayed
+6. **NEW**: Embeddings are automatically generated for semantic search
 
 ### Organizing with Collections
 
@@ -159,24 +200,55 @@ Current placeholder in `lib/video-transcriber.ts` needs integration with:
 4. View time-stamped segments
 5. Click timestamps to seek in video (requires player integration)
 
+## AI Features Technical Details
+
+### RAG Implementation
+
+**Embedding Generation:**
+- Model: `text-embedding-3-small` (1536 dimensions)
+- Content: Combines title + description + URL
+- Triggers: Automatic on bookmark creation/update
+- Storage: Vector field in bookmarks table
+
+**Vector Search:**
+- Index: `by_embedding` on bookmarks table
+- Filter: User-scoped (only searches your bookmarks)
+- Limit: Top 5-10 most relevant results
+- Similarity: Cosine similarity (built into Convex)
+
+**Chat Completion:**
+- Model: `gpt-4o-mini` (cost-effective, fast)
+- Context: Top 5 relevant bookmarks with transcripts
+- Max Tokens: 500 per response
+- Temperature: 0.7 (balanced creativity)
+
+### API Costs (Approximate)
+
+- Embedding generation: ~$0.0001 per bookmark
+- Vector search: Free (Convex built-in)
+- Chat completion: ~$0.001-0.003 per query
+- Typical user: <$1/month for moderate usage
+
 ## Future Enhancements
 
 ### Priority
 
 1. **Real Video Transcription**: Integrate with Whisper API or AssemblyAI
-2. **Browser Extension**: Quick-save clipper for browsers
-3. **Preview Snapshots**: Capture visual previews of web pages
-4. **Video Player Integration**: Embed YouTube/Instagram players with sync
+2. **Automatic Embedding Updates**: Background job to re-embed when content changes
+3. **Browser Extension**: Quick-save clipper with instant embedding
+4. **Advanced RAG**: Multi-query retrieval, re-ranking, hybrid search
+5. **Chat History**: Persist conversations for context
 
 ### Nice to Have
 
-- Bookmark import/export
-- Sharing collections
+- **AI-Powered Auto-Tagging**: Automatically suggest tags based on content
+- **Smart Collections**: AI-generated collection suggestions
+- **Bookmark Summarization**: Generate TL;DR for long articles
+- **Semantic Duplicates**: Find similar bookmarks using embeddings
+- Bookmark import/export with embeddings
+- Sharing collections with RAG enabled
 - Collaborative bookmarks
-- Full-text search across bookmarks and transcripts
 - Archive.org integration for dead links
-- Automatic tagging with AI
-- Duplicate detection
 - Bulk operations
 
 ## Technical Notes
@@ -209,9 +281,12 @@ NEXT_PUBLIC_CONVEX_URL=https://your-project.convex.cloud
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
 CLERK_SECRET_KEY=sk_test_...
 
-# Backend (Convex Dashboard)
+# Backend (Convex Dashboard - Settings → Environment Variables)
 CLERK_JWT_ISSUER_DOMAIN=https://your-app.clerk.accounts.dev
+OPENAI_API_KEY=sk-...  # REQUIRED for RAG & AI features
 ```
+
+**Important**: The `OPENAI_API_KEY` must be added in the Convex dashboard, not in `.env.local`, as it's used by server-side actions.
 
 ### Running Locally
 

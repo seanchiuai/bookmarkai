@@ -8,8 +8,13 @@
  * @module
  */
 
+import type * as bookmarks from "../bookmarks.js";
+import type * as collections from "../collections.js";
 import type * as myFunctions from "../myFunctions.js";
+import type * as ragBookmarks from "../ragBookmarks.js";
+import type * as tags from "../tags.js";
 import type * as todos from "../todos.js";
+import type * as transcripts from "../transcripts.js";
 
 import type {
   ApiFromModules,
@@ -17,26 +22,39 @@ import type {
   FunctionReference,
 } from "convex/server";
 
+declare const fullApi: ApiFromModules<{
+  bookmarks: typeof bookmarks;
+  collections: typeof collections;
+  myFunctions: typeof myFunctions;
+  ragBookmarks: typeof ragBookmarks;
+  tags: typeof tags;
+  todos: typeof todos;
+  transcripts: typeof transcripts;
+}>;
+
 /**
- * A utility for referencing Convex functions in your app's API.
+ * A utility for referencing Convex functions in your app's public API.
  *
  * Usage:
  * ```js
  * const myFunctionReference = api.myModule.myFunction;
  * ```
  */
-declare const fullApi: ApiFromModules<{
-  myFunctions: typeof myFunctions;
-  todos: typeof todos;
-}>;
-declare const fullApiWithMounts: typeof fullApi;
-
 export declare const api: FilterApi<
-  typeof fullApiWithMounts,
+  typeof fullApi,
   FunctionReference<any, "public">
 >;
+
+/**
+ * A utility for referencing Convex functions in your app's internal API.
+ *
+ * Usage:
+ * ```js
+ * const myFunctionReference = internal.myModule.myFunction;
+ * ```
+ */
 export declare const internal: FilterApi<
-  typeof fullApiWithMounts,
+  typeof fullApi,
   FunctionReference<any, "internal">
 >;
 

@@ -42,11 +42,18 @@ export default defineSchema({
       v.literal("completed"),
       v.literal("failed")
     ),
+    // RAG vector embedding for semantic search
+    embedding: v.optional(v.array(v.float64())),
   })
     .index("by_user", ["userId"])
     .index("by_user_and_collection", ["userId", "collectionId"])
     .index("by_url", ["url"])
-    .index("by_created", ["userId", "createdAt"]),
+    .index("by_created", ["userId", "createdAt"])
+    .vectorIndex("by_embedding", {
+      vectorField: "embedding",
+      dimensions: 1536, // OpenAI text-embedding-ada-002 dimensions
+      filterFields: ["userId"],
+    }),
 
   // Collections - Folders/groups for bookmarks
   collections: defineTable({

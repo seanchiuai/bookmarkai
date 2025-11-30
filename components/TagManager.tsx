@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
-import { Id } from "../convex/_generated/dataModel";
+import { Id, Doc } from "../convex/_generated/dataModel";
 
 export default function TagManager() {
   const [isCreating, setIsCreating] = useState(false);
@@ -13,7 +13,7 @@ export default function TagManager() {
   const [editName, setEditName] = useState("");
   const [editColor, setEditColor] = useState("");
 
-  const tags = useQuery(api.tags.list, {});
+  const tags = useQuery(api.tags.list, {}) as Doc<"tags">[] | undefined;
   const createTag = useMutation(api.tags.create);
   const updateTag = useMutation(api.tags.update);
   const removeTag = useMutation(api.tags.remove);

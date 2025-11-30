@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
-import { Id } from "../convex/_generated/dataModel";
+import { Id, Doc } from "../convex/_generated/dataModel";
 
 type Tab = "all" | "pending" | "completed";
 
@@ -15,7 +15,7 @@ export default function TodoDashboard() {
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
 
-  const todos = useQuery(api.todos.list);
+  const todos = useQuery(api.todos.list) as Doc<"todos">[] | undefined;
   const createTodo = useMutation(api.todos.create);
   const toggleComplete = useMutation(api.todos.toggleComplete);
   const removeTodo = useMutation(api.todos.remove);

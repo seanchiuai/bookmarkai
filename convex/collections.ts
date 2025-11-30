@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { Id } from "./_generated/dataModel";
 
 // List all collections for the current user
 export const list = query({
@@ -247,12 +248,12 @@ export const moveToParent = mutation({
 
     // Check if the new parent is a descendant of this collection
     if (args.parentId) {
-      let currentParentId = args.parentId;
+      let currentParentId: Id<"collections"> | undefined = args.parentId;
       while (currentParentId) {
         if (currentParentId === args.id) {
           throw new Error("Cannot create circular reference");
         }
-        const parent = await ctx.db.get(currentParentId);
+        const parent: { parentId?: Id<"collections"> } | null = await ctx.db.get(currentParentId);
         currentParentId = parent?.parentId;
       }
     }

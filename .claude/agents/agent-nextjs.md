@@ -2,6 +2,7 @@
 name: "Framework Nextjs Implementation"
 description: "Implementation guide for framework nextjs feature"
 tools: ["filesystem"]
+color: blue
 ---
 
 # Framework Nextjs Agent
